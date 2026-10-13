@@ -10,61 +10,48 @@ internal sealed class AltHoldDetector : IDisposable
     private const int WmKeyUp = 0x0101;
     private const int WmSysKeyDown = 0x0104;
     private const int WmSysKeyUp = 0x0105;
-    private const int HookActionCode = 0;
     private const int FlagsOffset = 8;
     private const int InjectedFlag = 0x10;
     private const byte MenuMaskKey = 0xE8;
     private const uint KeyUpFlag = 0x0002;
 
-    private readonly LowLevelKeyboardProc _hookCallback;
+    private readonly LowLevelHookThread _hook;
     private readonly SynchronizationContext _uiContext;
     private readonly Action _onHoldStarted;
     private readonly Action _onHoldEnded;
 
-    private IntPtr _hookHandle;
+    // Only touched by the hook thread while it runs.
     private bool _isHoldKeyDown;
     private bool _isHolding;
 
-    public bool IsListening => _hookHandle != IntPtr.Zero;
+    public bool IsListening => _hook.IsRunning;
 
     public AltHoldDetector(Action onHoldStarted, Action onHoldEnded)
     {
         _onHoldStarted = onHoldStarted;
         _onHoldEnded = onHoldEnded;
-        _hookCallback = OnKeyboardEvent;
+        _hook = new LowLevelHookThread(WhKeyboardLowLevel, OnKeyboardEvent);
         _uiContext = SynchronizationContext.Current ?? new WindowsFormsSynchronizationContext();
     }
 
-    public void Start()
-    {
-        if (IsListening)
-            return;
-
-        _hookHandle = SetWindowsHookEx(
-            WhKeyboardLowLevel,
-            _hookCallback,
-            GetModuleHandle(null),
-            0);
-    }
+    public void Start() => _hook.Start();
 
     public void Stop()
     {
         if (!IsListening)
             return;
 
-        UnhookWindowsHookEx(_hookHandle);
+        _hook.Stop();
 
-        _hookHandle = IntPtr.Zero;
         _isHoldKeyDown = false;
         _isHolding = false;
     }
 
-    private IntPtr OnKeyboardEvent(int code, IntPtr message, IntPtr data)
+    // Only observes the keys: every event still reaches the other apps.
+    private bool OnKeyboardEvent(IntPtr message, IntPtr data)
     {
-        if (code == HookActionCode)
-            HandleKeyEvent(message, data);
-
-        return CallNextHookEx(_hookHandle, code, message, data);
+        HandleKeyEvent(message, data);
+        return false;
     }
 
     private void HandleKeyEvent(IntPtr message, IntPtr data)

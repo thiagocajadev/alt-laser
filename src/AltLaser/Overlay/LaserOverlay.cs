@@ -31,7 +31,6 @@ internal sealed class LaserOverlay : Form
         ShowInTaskbar = false;
         StartPosition = FormStartPosition.Manual;
         AutoScaleMode = AutoScaleMode.None;
-        TopMost = true;
 
         _frameTimer = new System.Windows.Forms.Timer { Interval = LaserSettings.FrameIntervalMs };
         _frameTimer.Tick += (_, _) => RenderNextFrame();
@@ -51,7 +50,7 @@ internal sealed class LaserOverlay : Form
         _lastSignature = null;
 
         RenderNextFrame();
-        Show();
+        ShowWithoutFocus();
         _frameTimer.Start();
     }
 
@@ -111,8 +110,19 @@ internal sealed class LaserOverlay : Form
     private void FinishFadeOut()
     {
         _frameTimer.Stop();
-        Hide();
+        HideWithoutFocus();
     }
+
+    // The overlay must never become the active window. After the tray menu, Alt Laser owns the
+    // foreground, and hiding an active overlay hands the focus to the next window; when that one
+    // belongs to an admin app, Windows stops sending keyboard input to the Alt hook. So it is
+    // shown and hidden with SWP_NOACTIVATE, and kept on top by WS_EX_TOPMOST rather than the
+    // TopMost property, whose SetWindowPos call activates the window.
+    private void ShowWithoutFocus() =>
+        SetWindowPos(Handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpNoActivate | SwpShowWindow);
+
+    private void HideWithoutFocus() =>
+        SetWindowPos(Handle, IntPtr.Zero, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpNoZOrder | SwpNoActivate | SwpHideWindow);
 
     private void PresentFrame(Point? head, long nowMs)
     {

@@ -1,5 +1,3 @@
-using static AltLaser.Interop.NativeMethods;
-
 namespace AltLaser.Input;
 
 internal sealed class LeftButtonCapture : IDisposable
@@ -7,54 +5,42 @@ internal sealed class LeftButtonCapture : IDisposable
     private const int WhMouseLowLevel = 14;
     private const int WmLeftButtonDown = 0x0201;
     private const int WmLeftButtonUp = 0x0202;
-    private const int HookActionCode = 0;
-    private static readonly IntPtr SwallowEvent = new(1);
 
-    private readonly LowLevelMouseProc _hookCallback;
-    private IntPtr _hookHandle;
+    private readonly LowLevelHookThread _hook;
 
-    public bool IsPressed { get; private set; }
+    // Written by the hook thread, read by the UI thread.
+    private volatile bool _isPressed;
 
-    public bool IsCapturing => _hookHandle != IntPtr.Zero;
+    public bool IsPressed => _isPressed;
+
+    public bool IsCapturing => _hook.IsRunning;
 
     public LeftButtonCapture()
     {
-        _hookCallback = OnMouseEvent;
+        _hook = new LowLevelHookThread(WhMouseLowLevel, OnMouseEvent);
     }
 
-    public void Start()
-    {
-        if (IsCapturing)
-            return;
-
-        _hookHandle = SetWindowsHookEx(
-            WhMouseLowLevel,
-            _hookCallback,
-            GetModuleHandle(null),
-            0);
-    }
+    public void Start() => _hook.Start();
 
     public void Stop()
     {
         if (!IsCapturing)
             return;
 
-        UnhookWindowsHookEx(_hookHandle);
-
-        _hookHandle = IntPtr.Zero;
-        IsPressed = false;
+        _hook.Stop();
+        _isPressed = false;
     }
 
-    private IntPtr OnMouseEvent(int code, IntPtr message, IntPtr data)
+    // Swallows left button events so drawing does not click through to the apps below.
+    private bool OnMouseEvent(IntPtr message, IntPtr data)
     {
         var isLeftButtonEvent = message == WmLeftButtonDown || message == WmLeftButtonUp;
 
-        if (code != HookActionCode || !isLeftButtonEvent)
-            return CallNextHookEx(_hookHandle, code, message, data);
+        if (!isLeftButtonEvent)
+            return false;
 
-        IsPressed = message == WmLeftButtonDown;
-
-        return SwallowEvent;
+        _isPressed = message == WmLeftButtonDown;
+        return true;
     }
 
     public void Dispose() => Stop();
