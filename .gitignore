@@ -1,0 +1,13 @@
+# Build output
+bin/
+obj/
+
+# Single-file exe from dotnet publish -p:PublishProfile=SingleExe (attached to GitHub releases)
+publish/
+
+# IDE / user files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
