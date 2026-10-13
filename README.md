@@ -15,6 +15,10 @@
 Made for presentations, classes, and screen sharing on Windows: point at what matters and the
 mark clears itself, with nothing to undo.
 
+<p align="center">
+  <img src="docs/demo.gif" width="640" alt="Arrows drawn on the desktop with Alt Laser, fading out on their own" />
+</p>
+
 ## Install
 
 Windows 10 or 11 (64-bit). Nothing else to install.
@@ -22,9 +26,9 @@ Windows 10 or 11 (64-bit). Nothing else to install.
 1. Download [`AltLaser.exe`](../../releases/latest/download/AltLaser.exe) and save it anywhere.
 2. Open it. Alt Laser sits in the system tray, ready to use.
 
-Windows may show a SmartScreen warning the first time, because the app is new and not code-signed
-yet. Click **More info → Run anyway**. All the source code is in this repository, and you can
-build it yourself if you prefer.
+The first time, Windows may show a SmartScreen warning ("Windows protected your PC"), because the
+app is new and not code-signed yet. Click **Run anyway** (on some versions, click **More info**
+first). All the source code is in this repository, and you can build it yourself if you prefer.
 
 ## Use
 

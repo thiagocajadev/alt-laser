@@ -15,6 +15,10 @@
 Feito para apresentações, aulas e compartilhamento de tela no Windows: aponte para o que importa e
 a marcação some sozinha, sem nada para desfazer.
 
+<p align="center">
+  <img src="docs/demo.gif" width="640" alt="Setas desenhadas na área de trabalho com o Alt Laser, sumindo sozinhas" />
+</p>
+
 ## Instalar
 
 Windows 10 ou 11 (64 bits). Não precisa instalar mais nada.
@@ -22,9 +26,14 @@ Windows 10 ou 11 (64 bits). Não precisa instalar mais nada.
 1. Baixe o [`AltLaser.exe`](../../releases/latest/download/AltLaser.exe) e salve onde quiser.
 2. Abra o arquivo. O Alt Laser fica na bandeja do sistema, pronto para usar.
 
-Na primeira vez, o Windows pode mostrar um aviso do SmartScreen, porque o app é novo e ainda não tem
-assinatura digital. Clique em **Mais informações → Executar assim mesmo**. Todo o código-fonte está
-neste repositório, e você pode compilar o app se preferir.
+Na primeira vez, o Windows pode mostrar o aviso abaixo do SmartScreen, porque o app é novo e ainda
+não tem assinatura digital. Clique em **Executar assim mesmo** (em algumas versões, clique antes em
+**Mais informações**). Todo o código-fonte está neste repositório, e você pode compilar o app se
+preferir.
+
+<p align="center">
+  <img src="docs/smartscreen-pt-BR.png" width="420" alt="Aviso do SmartScreen com o botão Executar assim mesmo" />
+</p>
 
 ## Usar
 
@@ -33,6 +42,10 @@ neste repositório, e você pode compilar o app se preferir.
 - **Clique com o botão direito no ícone da bandeja** para alternar entre **Seta** e **Livre**,
   escolher a **Cor**, quanto tempo os traços ficam (**Sumir após**) ou trocar o **Idioma**. As
   escolhas ficam salvas.
+
+<p align="center">
+  <img src="docs/menu-pt-BR.png" alt="Menu do Alt Laser na bandeja: Desligar, Seta, Livre, Cor, Sumir após, Idioma, Sobre e Sair" />
+</p>
 
 Atalhos como `Alt+Tab` continuam funcionando normalmente, e o Alt direito (AltGr) nunca é usado.
 
